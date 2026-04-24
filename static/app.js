@@ -79,7 +79,7 @@ function renderTasks() {
     if (!list) return;
     list.innerHTML = '';
     if (state.tasks.length === 0) {
-        list.innerHTML = `<div class="text-center py-10 italic font-bold text-white opacity-40">No active decrees.</div>`;
+        list.innerHTML = `<div class="text-center py-10 italic font-bold text-white opacity-40">No active quests.</div>`;
         return;
     }
     state.tasks.forEach((task, index) => {
