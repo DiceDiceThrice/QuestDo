@@ -1,19 +1,19 @@
 // Advanced State Management
 const DEFAULT_BADGES = [
     { id: 1, name: "The Squire's Start", description: "Earned a basic tunic.", requirement: 1, 
-      sprite: '<svg viewBox="0 0 24 24" fill="%238B4513"><path d="M12,2L4,5v11c0,5.55,3.84,10.74,8,12c4.16-1.26,8-6.45,8-12V5L12,2z M12,21c-3.11-1.24-5-4.83-5-8.5V7.2l5-1.88l5,1.88V12.5c0,3.67-1.89,7.26-5,8.5z"/></svg>' },
+      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,2L4,5v11c0,5.55,3.84,10.74,8,12c4.16-1.26,8-6.45,8-12V5L12,2z" fill="%238B4513"/></svg>` },
     
     { id: 2, name: "Light Skirmisher", description: "Secured a leather chestpiece.", requirement: 5, 
-      sprite: '<svg viewBox="0 0 24 24" fill="%23cd7f32"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/></svg>' },
+      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="%23cd7f32"/></svg>` },
     
     { id: 3, name: "Rugged Vanguard", description: "Constructed iron-plate mail.", requirement: 10, 
-      sprite: '<svg viewBox="0 0 24 24" fill="%23708090"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>' },
+      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2z" fill="%23708090"/></svg>` },
     
     { id: 4, name: "Radiant Sentinel", description: "Adorned in shining steel.", requirement: 15, 
-      sprite: '<svg viewBox="0 0 24 24" fill="%23B0C4DE"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>' },
+      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="%23B0C4DE"/></svg>` },
     
     { id: 5, name: "Immortal Paladin", description: "The legendary heavy aegis.", requirement: 25, 
-      sprite: '<svg viewBox="0 0 24 24" fill="%23d4af37"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2M12,14.5L7.5,18.4L12,4.3L16.5,18.4L12,14.5Z"/></svg>' }
+      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2M12,14.5L7.5,18.4L12,4.3L16.5,18.4L12,14.5Z" fill="%23d4af37"/></svg>` }
 ];
 
 let state = JSON.parse(localStorage.getItem('questDoState')) || {
@@ -23,11 +23,8 @@ let state = JSON.parse(localStorage.getItem('questDoState')) || {
     badges: DEFAULT_BADGES
 };
 
-// Migration
-state.badges = state.badges.map((badge, index) => ({
-    ...DEFAULT_BADGES[index],
-    ...badge
-}));
+// Update to ensure latest sprites are used
+state.badges = DEFAULT_BADGES.map((b, i) => ({...b, is_unlocked: (state.badges[i] ? state.badges[i].is_unlocked : false)}));
 
 document.addEventListener('DOMContentLoaded', () => {
     renderAll();
@@ -57,7 +54,7 @@ function switchTab(tab) {
         tSection.classList.remove('hidden');
         tBtn.classList.add('active'); tBtn.classList.remove('opacity-60');
         qBtn.classList.remove('active'); qBtn.classList.add('opacity-60');
-        renderBadges();
+        setTimeout(renderBadges, 50); // Small delay to ensure DOM is visible
     }
 }
 
@@ -71,12 +68,10 @@ function renderStats() {
 function renderTasks() {
     const list = document.getElementById('task-list');
     list.innerHTML = '';
-    
     if (state.tasks.length === 0) {
         list.innerHTML = `<div class="text-center py-10 italic font-bold text-wood opacity-40">No active decrees.</div>`;
         return;
     }
-
     state.tasks.forEach((task, index) => {
         const li = document.createElement('div');
         li.className = `bounty-card flex items-center gap-4 p-5 rounded-xl shadow-lg ${task.is_completed ? 'opacity-50' : ''}`;
@@ -91,22 +86,23 @@ function renderTasks() {
 
 function renderBadges() {
     const container = document.getElementById('nodes-container');
+    if (!container) return;
     container.innerHTML = '';
 
     const completedCount = state.tasks.filter(t => t.is_completed).length;
     
-    // Default Trainee Sprite (Leather brown)
-    let currentHeroSprite = '<svg viewBox="0 0 24 24" fill="%238B4513"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H7V9H1v2h2v11h18V11h2V9z"/></svg>';
+    // Default Trainee (Brown clothes)
+    let currentHeroSprite = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H7V9H1v2h2v11h18V11h2V9z" fill="%238B4513"/></svg>`;
     let knightPos = { bottom: 40, left: 10 };
 
     state.badges.forEach((badge, index) => {
         const isUnlocked = completedCount >= badge.requirement;
-        const bottom = 120 + (index * 130);
-        const left = (index % 2 === 0) ? 70 : 20;
+        const bottom = 120 + (index * 120);
+        const left = (index % 2 === 0) ? 65 : 25;
 
         if (isUnlocked) {
-            knightPos = { bottom: bottom + 20, left: left };
-            currentHeroSprite = badge.sprite; // Update hero sprite to latest unlocked
+            knightPos = { bottom: bottom + 10, left: left };
+            currentHeroSprite = badge.sprite;
         }
 
         const node = document.createElement('div');
@@ -115,9 +111,7 @@ function renderBadges() {
         node.style.left = `${left}%`;
         
         node.innerHTML = `
-            <div class="flag-pole">
-                <div class="flag-cloth"></div>
-            </div>
+            <div class="flag-pole"><div class="flag-cloth"></div></div>
             <div class="node-info">
                 <h4 class="font-black uppercase">${badge.name}</h4>
                 <p>${isUnlocked ? 'CONQUERED' : badge.requirement + ' QUESTS'}</p>
@@ -126,13 +120,18 @@ function renderBadges() {
         container.appendChild(node);
     });
 
-    // Update Knight Graphic
     const knight = document.getElementById('knight');
-    knight.style.bottom = `${knightPos.bottom}px`;
-    knight.style.left = `${knightPos.left}%`;
-    
-    const knightGraphic = knight.querySelector('.knight-graphic');
-    knightGraphic.style.backgroundImage = `url('data:image/svg+xml;utf8,${currentHeroSprite}')`;
+    if (knight) {
+        knight.style.bottom = `${knightPos.bottom}px`;
+        knight.style.left = `${knightPos.left}%`;
+        const graphic = knight.querySelector('.knight-graphic');
+        if (graphic) {
+            // Encode the SVG properly for data URL
+            const encodedSvg = btoa(currentHeroSprite.replace('fill="%23', 'fill="#'));
+            graphic.style.backgroundImage = `url('data:image/svg+xml;base64,${encodedSvg}')`;
+            graphic.style.display = 'block';
+        }
+    }
 }
 
 function addTask() {
