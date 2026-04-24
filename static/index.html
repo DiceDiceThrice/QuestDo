@@ -202,10 +202,13 @@
             </div>
             <div class="mt-4 space-y-2">
                 <div class="flex justify-between rpg-header text-sm font-bold text-wood">
-                    <span>Soul Power</span>
+                    <span>Bounty Progress</span>
                     <span id="xp-text">0 / 100</span>
                 </div>
-                <div class="xp-vial h-6"><div id="xp-fill" class="xp-fluid h-full"></div></div>
+                <!-- Progress Bar Container -->
+                <div class="w-full h-6 bg-wood/20 border-2 border-wood rounded-full overflow-hidden shadow-inner p-0.5">
+                    <div id="xp-fill" class="h-full bg-gradient-to-r from-amber-400 to-yellow-600 rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(251,191,36,0.5)]" style="width: 0%"></div>
+                </div>
             </div>
         </header>
 
@@ -220,7 +223,8 @@
             <div class="relative group">
                 <input type="text" id="task-input" onkeypress="handleEnter(event)" placeholder="What is your next decree?" 
                        class="w-full bg-[#f4e4bc] border-4 border-[#3d2b1f] rounded-xl p-5 text-[#3d2b1f] font-bold placeholder:text-wood/40 focus:outline-none shadow-inner">
-                <button onclick="addTask()" class="absolute right-3 top-3 h-12 w-12 bg-crimson text-gold border-2 border-gold rounded-lg flex items-center justify-center shadow-lg hover:scale-105 transition-all"><span class="material-icons">add_task</span></button>
+                <!-- Updated Button: Golden color to contrast with the parchment input -->
+                <button onclick="addTask()" class="absolute right-3 top-3 h-12 w-12 bg-gold text-wood border-2 border-wood rounded-lg flex items-center justify-center shadow-lg hover:bg-amber-500 hover:scale-110 active:scale-95 transition-all"><span class="material-icons">add_task</span></button>
             </div>
             <div id="task-list" class="space-y-4"></div>
         </section>
@@ -257,10 +261,10 @@
 
     </div>
 
-    <!-- Loot Toast -->
-    <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 px-10 py-6 rounded-2xl shadow-2xl text-center opacity-0 pointer-events-none transition-all duration-500 transform -translate-y-20 z-50">
-        <h3 class="text-2xl font-black">QUEST CONQUERED!</h3>
-        <p class="text-xs font-bold tracking-widest text-white mt-1">+10 POWER GAINED</p>
+    <!-- Loot Toast: Fixed Background transparency -->
+    <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 px-10 py-6 rounded-2xl shadow-2xl text-center opacity-0 pointer-events-none transition-all duration-500 transform -translate-y-20 z-50 bg-[#3d2b1f] border-4 border-[#d4af37]">
+        <h3 class="text-2xl font-black text-gold rpg-header">QUEST CONQUERED!</h3>
+        <p class="text-xs font-bold tracking-widest text-white mt-1 uppercase">Bounty progress increased</p>
     </div>
 
     <script src="app.js"></script>
