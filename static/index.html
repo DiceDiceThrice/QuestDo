@@ -44,12 +44,6 @@
             border: 8px solid #3d2b1f;
             border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect x="0" y="0" width="50" height="50" fill="none" stroke="%233d2b1f" stroke-width="10"/></svg>') 10;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .gold-border {
-            border: 2px solid var(--gold);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
 
         .xp-vial {
@@ -76,23 +70,12 @@
 
         .bounty-card:nth-child(even) { transform: rotate(0.5deg); }
 
-        .bounty-card:hover {
-            transform: scale(1.02) rotate(0deg);
-            z-index: 10;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-        }
-
         .rpg-btn {
             background: var(--wood);
             border: 2px solid var(--gold);
             color: var(--gold);
             transition: all 0.2s;
             text-shadow: 1px 1px 2px black;
-        }
-
-        .rpg-btn:active {
-            transform: scale(0.95);
-            background: #2a1b12;
         }
 
         .rpg-btn.active {
@@ -113,34 +96,84 @@
             border: 2px solid #5a100a;
         }
 
-        .seal-checkbox:checked {
-            background: #4a8a4a;
-            border-color: #1e4a1e;
-        }
-
+        .seal-checkbox:checked { background: #4a8a4a; border-color: #1e4a1e; }
         .seal-checkbox:checked::after {
             content: '✓';
             position: absolute;
             color: white;
             font-weight: bold;
-            top: 50%;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+
+        /* The Mountain Climb */
+        .mountain-container {
+            height: 600px;
+            background: linear-gradient(to top, #3d2b1f, #1a120b);
+            border: 4px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .climb-path {
+            position: absolute;
             left: 50%;
-            transform: translate(-50%, -50%);
+            bottom: 0;
+            width: 4px;
+            height: 100%;
+            background: repeating-linear-gradient(to top, transparent, transparent 10px, var(--gold) 10px, var(--gold) 20px);
+            transform: translateX(-50%);
+            opacity: 0.3;
         }
 
-        .badge-locked { filter: sepia(1) brightness(0.5) contrast(0.8); }
-        .badge-unlocked { animation: shine 3s infinite; }
-
-        @keyframes shine {
-            0% { filter: brightness(1); }
-            50% { filter: brightness(1.3) drop-shadow(0 0 10px gold); }
-            100% { filter: brightness(1); }
+        .milestone {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
         }
 
-        .floating-scroll {
-            background: #e2d1a6;
-            border: 2px solid #3d2b1f;
-            border-radius: 0 0 20px 20px;
+        .milestone-card {
+            background: var(--parchment);
+            border: 2px solid var(--wood);
+            padding: 8px 12px;
+            border-radius: 10px;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.5s;
+        }
+
+        .milestone.locked .milestone-card { opacity: 0.4; filter: grayscale(1); }
+        .milestone.unlocked .milestone-card { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
+
+        .hero-token {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: bottom 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 20;
+        }
+
+        .hero-sprite {
+            background: var(--crimson);
+            border: 3px solid var(--gold);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--gold);
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
         }
 
         #toast {
@@ -154,14 +187,10 @@
 <body class="p-4 md:p-8">
     <div class="max-w-2xl mx-auto space-y-8">
         
-        <!-- Hero Crest (Header) -->
-        <header class="parchment-card p-6 rounded shadow-2xl overflow-hidden">
-            <div class="absolute top-0 right-0 w-24 h-24 opacity-10 pointer-events-none">
-                <span class="material-icons text-9xl -rotate-12">shield</span>
-            </div>
-            
-            <div class="flex items-center gap-6 mb-6">
-                <div class="w-20 h-20 rounded-full border-4 border-wood flex items-center justify-center bg-wood shadow-inner">
+        <!-- Header -->
+        <header class="parchment-card p-6 rounded shadow-2xl overflow-hidden relative">
+            <div class="flex items-center gap-6">
+                <div class="w-20 h-20 rounded-full border-4 border-wood flex items-center justify-center bg-wood">
                     <span class="material-icons text-5xl text-gold">person</span>
                 </div>
                 <div class="flex-1">
@@ -169,53 +198,48 @@
                     <h2 id="level-text" class="rpg-header text-4xl font-black text-crimson">Rank 1</h2>
                 </div>
             </div>
-
-            <div class="space-y-2">
+            <div class="mt-4 space-y-2">
                 <div class="flex justify-between rpg-header text-sm font-bold text-wood">
                     <span>Power (XP)</span>
                     <span id="xp-text">0 / 100</span>
                 </div>
-                <div class="xp-vial h-6">
-                    <div id="xp-fill" class="xp-fluid h-full" style="width: 0%"></div>
-                </div>
+                <div class="xp-vial h-6"><div id="xp-fill" class="xp-fluid h-full"></div></div>
             </div>
         </header>
 
         <!-- Navigation -->
         <nav class="flex gap-4">
-            <button id="tab-quests" onclick="switchTab('quests')" class="rpg-btn flex-1 py-3 rounded font-bold rpg-header text-lg shadow-xl active">
-                Bounty Board
-            </button>
-            <button id="tab-trophy" onclick="switchTab('trophy')" class="rpg-btn flex-1 py-3 rounded font-bold rpg-header text-lg shadow-xl opacity-60">
-                Treasure Room
-            </button>
+            <button id="tab-quests" onclick="switchTab('quests')" class="rpg-btn flex-1 py-3 rounded font-bold rpg-header text-lg active">Bounty Board</button>
+            <button id="tab-trophy" onclick="switchTab('trophy')" class="rpg-btn flex-1 py-3 rounded font-bold rpg-header text-lg opacity-60">The Ascent</button>
         </nav>
 
-        <!-- Main Quest View -->
+        <!-- Quest Board -->
         <section id="quests-section" class="space-y-6 animate__animated animate__fadeIn">
             <div class="relative group">
                 <input type="text" id="task-input" onkeypress="handleEnter(event)" placeholder="Scribe a new bounty..." 
                        class="w-full bg-[#f4e4bc] border-4 border-[#3d2b1f] rounded p-4 text-[#3d2b1f] font-bold placeholder:text-wood/40 focus:outline-none shadow-inner">
-                <button onclick="addTask()" class="absolute right-2 top-2 h-12 w-12 bg-crimson text-gold border-2 border-gold rounded flex items-center justify-center hover:bg-red-800 transition-all shadow-lg">
-                    <span class="material-icons">add_task</span>
-                </button>
+                <button onclick="addTask()" class="absolute right-2 top-2 h-12 w-12 bg-crimson text-gold border-2 border-gold rounded flex items-center justify-center shadow-lg"><span class="material-icons">add_task</span></button>
             </div>
-
-            <div id="task-list" class="space-y-4 pt-2">
-                <!-- Quests will look like bounty notices -->
-            </div>
+            <div id="task-list" class="space-y-4"></div>
         </section>
 
-        <!-- Trophy Room View -->
-        <section id="trophy-section" class="hidden animate__animated animate__fadeIn">
-            <div class="grid grid-cols-2 gap-6" id="badge-grid">
-                <!-- Badges will look like artifacts -->
+        <!-- The Ascent (Mountain View) -->
+        <section id="trophy-section" class="hidden animate__animated animate__fadeIn space-y-4">
+            <h3 class="rpg-header text-2xl text-center text-gold">The Mountain of Mastery</h3>
+            <div class="mountain-container" id="mountain">
+                <div class="climb-path"></div>
+                <!-- Milestones will be injected here -->
+                <div id="hero-token" class="hero-token" style="bottom: 20px;">
+                    <div class="hero-sprite">
+                        <span class="material-icons text-white">directions_run</span>
+                    </div>
+                </div>
             </div>
         </section>
 
     </div>
 
-    <!-- Loot Banner (Toast) -->
+    <!-- Toast -->
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 px-10 py-6 rounded shadow-2xl text-center opacity-0 pointer-events-none transition-all duration-500 transform -translate-y-20 z-50">
         <h3 class="text-2xl font-black">QUEST COMPLETE!</h3>
         <p class="text-xs font-bold tracking-widest text-white mt-1">+10 POWER GAINED</p>
