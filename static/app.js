@@ -1,9 +1,9 @@
 // Advanced State Management
 const DEFAULT_BADGES = [
-    { id: 1, name: "Slayer of Procrastination", description: "Complete your first bounty!", requirement: 1, icon: "flare" },
-    { id: 2, name: "Wandering Knight", description: "Complete 5 bounties.", requirement: 5, icon: "explore" },
-    { id: 3, name: "Legendary Hero", description: "Complete 10 bounties.", requirement: 10, icon: "workspace_premium" },
-    { id: 4, name: "Immortal Sage", description: "Complete 25 bounties.", requirement: 25, icon: "auto_fix_high" }
+    { id: 1, name: "Slayer of Procrastination", description: "First bounty conquered!", requirement: 1 },
+    { id: 2, name: "Wandering Knight", description: "5 bounties completed.", requirement: 5 },
+    { id: 3, name: "Legendary Defender", description: "10 bounties completed.", requirement: 10 },
+    { id: 4, name: "Immortal Sage", description: "25 bounties completed.", requirement: 25 }
 ];
 
 let state = JSON.parse(localStorage.getItem('questDoState')) || {
@@ -13,7 +13,6 @@ let state = JSON.parse(localStorage.getItem('questDoState')) || {
     badges: DEFAULT_BADGES
 };
 
-// Migration
 state.badges = state.badges.map((badge, index) => ({
     ...DEFAULT_BADGES[index],
     ...badge
@@ -23,9 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAll();
 });
 
-function saveState() {
-    localStorage.setItem('questDoState', JSON.stringify(state));
-}
+function saveState() { localStorage.setItem('questDoState', JSON.stringify(state)); }
 
 function renderAll() {
     renderStats();
@@ -34,25 +31,21 @@ function renderAll() {
 }
 
 function switchTab(tab) {
-    const questsSection = document.getElementById('quests-section');
-    const trophySection = document.getElementById('trophy-section');
-    const tabQuests = document.getElementById('tab-quests');
-    const tabTrophy = document.getElementById('tab-trophy');
+    const qSection = document.getElementById('quests-section');
+    const tSection = document.getElementById('trophy-section');
+    const qBtn = document.getElementById('tab-quests');
+    const tBtn = document.getElementById('tab-trophy');
 
     if (tab === 'quests') {
-        questsSection.classList.remove('hidden');
-        trophySection.classList.add('hidden');
-        tabQuests.classList.add('active');
-        tabQuests.classList.remove('opacity-60');
-        tabTrophy.classList.remove('active');
-        tabTrophy.classList.add('opacity-60');
+        qSection.classList.remove('hidden');
+        tSection.classList.add('hidden');
+        qBtn.classList.add('active'); qBtn.classList.remove('opacity-60');
+        tBtn.classList.remove('active'); tBtn.classList.add('opacity-60');
     } else {
-        questsSection.classList.add('hidden');
-        trophySection.classList.remove('hidden');
-        tabTrophy.classList.add('active');
-        tabTrophy.classList.remove('opacity-60');
-        tabQuests.classList.remove('active');
-        tabQuests.classList.add('opacity-60');
+        qSection.classList.add('hidden');
+        tSection.classList.remove('hidden');
+        tBtn.classList.add('active'); tBtn.classList.remove('opacity-60');
+        qBtn.classList.remove('active'); qBtn.classList.add('opacity-60');
         renderBadges();
     }
 }
@@ -69,70 +62,66 @@ function renderTasks() {
     list.innerHTML = '';
     
     if (state.tasks.length === 0) {
-        list.innerHTML = `
-            <div class="text-center py-10 opacity-40 italic font-bold text-wood">
-                <span class="material-icons text-5xl mb-2">history_edu</span>
-                <p>The Bounty Board is empty. Scribe a quest to begin.</p>
-            </div>
-        `;
+        list.innerHTML = `<div class="text-center py-10 italic font-bold text-wood opacity-40">No active decrees.</div>`;
         return;
     }
 
     state.tasks.forEach((task, index) => {
         const li = document.createElement('div');
-        li.className = `bounty-card flex items-center gap-4 p-5 rounded shadow-lg ${task.is_completed ? 'opacity-50' : ''}`;
+        li.className = `bounty-card flex items-center gap-4 p-5 rounded-xl shadow-lg ${task.is_completed ? 'opacity-50' : ''}`;
         li.innerHTML = `
-            <input type="checkbox" ${task.is_completed ? 'checked disabled' : ''} 
-                   onchange="completeTask(${index})" 
-                   class="seal-checkbox">
+            <input type="checkbox" ${task.is_completed ? 'checked disabled' : ''} onchange="completeTask(${index})" class="seal-checkbox">
             <span class="flex-1 text-xl font-bold text-wood rpg-body ${task.is_completed ? 'line-through text-wood/40' : ''}">${task.title}</span>
-            <button onclick="deleteTask(${index})" class="p-2 text-wood/40 hover:text-crimson transition-all">
-                <span class="material-icons">close</span>
-            </button>
+            <button onclick="deleteTask(${index})" class="text-wood/40 hover:text-crimson"><span class="material-icons">close</span></button>
         `;
         list.appendChild(li);
     });
 }
 
 function renderBadges() {
-    const mountain = document.getElementById('mountain');
-    // Clear old milestones but keep path and hero
-    const oldMilestones = mountain.querySelectorAll('.milestone');
-    oldMilestones.forEach(m => m.remove());
+    const container = document.getElementById('nodes-container');
+    container.innerHTML = '';
 
     const completedCount = state.tasks.filter(t => t.is_completed).length;
-    let maxUnlockedBottom = 20;
+    let knightPos = { bottom: 40, left: 10 };
 
     state.badges.forEach((badge, index) => {
         const isUnlocked = completedCount >= badge.requirement;
-        const bottomPos = 100 + (index * 130); // Vertical spacing
         
-        if (isUnlocked) maxUnlockedBottom = bottomPos;
+        // Stagger positions for zig-zag
+        const bottom = 120 + (index * 140);
+        const left = (index % 2 === 0) ? 70 : 20;
 
-        const milestoneDiv = document.createElement('div');
-        milestoneDiv.className = `milestone ${isUnlocked ? 'unlocked' : 'locked'}`;
-        milestoneDiv.style.bottom = `${bottomPos}px`;
+        if (isUnlocked) {
+            knightPos = { bottom: bottom + 20, left: left };
+        }
+
+        const node = document.createElement('div');
+        node.className = `milestone-node ${isUnlocked ? 'unlocked' : 'locked'}`;
+        node.style.bottom = `${bottom}px`;
+        node.style.left = `${left}%`;
         
-        milestoneDiv.innerHTML = `
-            <div class="milestone-card">
-                <span class="material-icons text-2xl mb-1">${isUnlocked ? 'stars' : 'lock'}</span>
-                <h4 class="font-black text-xs uppercase leading-tight">${badge.name}</h4>
-                <p class="text-[9px] italic">${badge.description}</p>
+        node.innerHTML = `
+            <div class="flag-pole">
+                <div class="flag-cloth"></div>
+            </div>
+            <div class="node-info">
+                <h4 class="font-black uppercase">${badge.name}</h4>
+                <p>${isUnlocked ? 'CONQUERED' : badge.requirement + ' QUESTS'}</p>
             </div>
         `;
-        mountain.appendChild(milestoneDiv);
+        container.appendChild(node);
     });
 
-    // Move Hero Token
-    const heroToken = document.getElementById('hero-token');
-    heroToken.style.bottom = `${maxUnlockedBottom}px`;
+    const knight = document.getElementById('knight');
+    knight.style.bottom = `${knightPos.bottom}px`;
+    knight.style.left = `${knightPos.left}%`;
 }
 
 function addTask() {
     const input = document.getElementById('task-input');
     const title = input.value.trim();
     if (!title) return;
-
     state.tasks.unshift({ title, is_completed: false });
     input.value = '';
     saveState();
@@ -143,11 +132,9 @@ function handleEnter(e) { if (e.key === 'Enter') addTask(); }
 
 function completeTask(index) {
     if (state.tasks[index].is_completed) return;
-
     state.tasks[index].is_completed = true;
     state.xp += 10;
     state.level = Math.floor(state.xp / 100) + 1;
-
     showToast();
     saveState();
     renderAll();
