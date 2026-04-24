@@ -50,7 +50,6 @@ function switchTab(tab) {
 }
 
 function renderStats() {
-    document.getElementById('level-text').innerText = `Rank ${state.level}`;
     const xpPercent = state.xp % 100;
     document.getElementById('xp-fill').style.width = `${xpPercent}%`;
     document.getElementById('xp-text').innerText = `${xpPercent} / 100`;
@@ -66,11 +65,13 @@ function renderStats() {
             break;
         }
     }
-    document.getElementById('rank-title').innerText = currentTitle;
+    const rankTitleEl = document.getElementById('rank-title');
+    if (rankTitleEl) rankTitleEl.innerText = currentTitle;
 }
 
 function renderTasks() {
     const list = document.getElementById('task-list');
+    if (!list) return;
     list.innerHTML = '';
     if (state.tasks.length === 0) {
         list.innerHTML = `<div class="text-center py-10 italic font-bold text-wood opacity-40">No active decrees.</div>`;
@@ -128,7 +129,6 @@ function renderBadges() {
         knight.style.left = `${knightPos.left}%`;
         const graphic = knight.querySelector('.knight-graphic');
         if (graphic) {
-            // Using the new PNG for the climbing knight
             graphic.style.backgroundImage = "url('knight.png')";
             graphic.style.display = 'block';
         }
@@ -157,15 +157,48 @@ function completeTask(index) {
     renderAll();
 }
 
+// New Multi-Action Functions
+function checkAllTasks() {
+    let tasksUpdated = false;
+    state.tasks.forEach(task => {
+        if (!task.is_completed) {
+            task.is_completed = true;
+            state.xp += 10;
+            tasksUpdated = true;
+        }
+    });
+    
+    if (tasksUpdated) {
+        state.level = Math.floor(state.xp / 100) + 1;
+        saveState();
+        renderAll();
+        showToast("All Bounties Conquered!");
+    }
+}
+
+function removeAllTasks() {
+    if (confirm("Are you sure you want to clear the Bounty Board? This will reset your progress and rank.")) {
+        state.tasks = [];
+        state.xp = 0;
+        state.level = 1;
+        saveState();
+        renderAll();
+    }
+}
+
 function deleteTask(index) {
     state.tasks.splice(index, 1);
     saveState();
     renderTasks();
     renderBadges();
+    renderStats();
 }
 
-function showToast() {
+function showToast(message = "QUEST CONQUERED!") {
     const toast = document.getElementById('toast');
+    const toastTitle = toast.querySelector('h3');
+    if (toastTitle) toastTitle.innerText = message;
+    
     toast.style.opacity = '1';
     toast.style.transform = 'translate(-50%, 0)';
     setTimeout(() => {

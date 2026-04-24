@@ -20,6 +20,13 @@
             --mountain-peak: #5c4033;
         }
 
+        .text-wood { color: var(--wood); }
+        .text-crimson { color: var(--crimson); }
+        .text-gold { color: var(--gold); }
+        .bg-wood { background-color: var(--wood); }
+        .bg-crimson { background-color: var(--crimson); }
+        .bg-gold { background-color: var(--gold); }
+
         body {
             font-family: 'Quicksand', sans-serif;
             background: #0a0705;
@@ -206,7 +213,7 @@
                 </div>
                 <div class="flex-1">
                     <h1 id="rank-title" class="text-xs font-bold uppercase tracking-widest text-wood/60 transition-all duration-500">Unproven Recruit</h1>
-                    <h2 id="level-text" class="rpg-header text-4xl font-black text-crimson uppercase">Rank 1</h2>
+                    <!-- Numerical Rank removed as requested -->
                 </div>
             </div>
             <div class="mt-4 space-y-2">
@@ -232,9 +239,19 @@
             <div class="relative group">
                 <input type="text" id="task-input" onkeypress="handleEnter(event)" placeholder="What is your next decree?" 
                        class="w-full bg-[#f4e4bc] border-4 border-[#3d2b1f] rounded-xl p-5 text-[#3d2b1f] font-bold placeholder:text-wood/40 focus:outline-none shadow-inner">
-                <!-- Updated Button: Golden color to contrast with the parchment input -->
                 <button onclick="addTask()" class="absolute right-3 top-3 h-12 w-12 bg-gold text-wood border-2 border-wood rounded-lg flex items-center justify-center shadow-lg hover:bg-amber-500 hover:scale-110 active:scale-95 transition-all"><span class="material-icons">add_task</span></button>
             </div>
+
+            <!-- New Multi-Action Buttons -->
+            <div class="flex gap-3">
+                <button onclick="checkAllTasks()" class="flex-1 bg-green-800 text-white font-bold py-2 px-4 rounded border-2 border-green-950 hover:bg-green-700 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                    <span class="material-icons text-sm">done_all</span> Check All
+                </button>
+                <button onclick="removeAllTasks()" class="flex-1 bg-red-900 text-white font-bold py-2 px-4 rounded border-2 border-red-950 hover:bg-red-800 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                    <span class="material-icons text-sm">delete_sweep</span> Remove All
+                </button>
+            </div>
+
             <div id="task-list" class="space-y-4"></div>
         </section>
 
