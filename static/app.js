@@ -11,14 +11,12 @@ let state = JSON.parse(localStorage.getItem('questDoState')) || {
     xp: 0,
     level: 1,
     tasks: [],
-    completedHistory: [], // New property for progress tracking
+    completedHistory: [],
     badges: DEFAULT_BADGES
 };
 
-// Ensure new property exists
 if (!state.completedHistory) state.completedHistory = [];
 
-// Sync metadata
 state.badges = DEFAULT_BADGES.map((b, i) => ({...b, is_unlocked: (state.badges[i] ? state.badges[i].is_unlocked : false)}));
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -46,11 +44,9 @@ function switchTab(tab) {
         'trophy': document.getElementById('tab-trophy')
     };
 
-    // Hide all, deactivate all
     Object.values(sections).forEach(s => s.classList.add('hidden'));
     Object.values(buttons).forEach(b => { b.classList.remove('active'); b.classList.add('opacity-60'); });
 
-    // Show selected, activate selected
     sections[tab].classList.remove('hidden');
     buttons[tab].classList.add('active');
     buttons[tab].classList.remove('opacity-60');
@@ -65,7 +61,7 @@ function renderStats() {
     document.getElementById('xp-fill').style.width = `${xpPercent}%`;
     document.getElementById('xp-text').innerText = `${xpPercent} / 100`;
 
-    const completedCount = state.tasks.filter(t => t.is_completed).length + state.completedHistory.length;
+    const completedCount = state.completedHistory.length;
     let currentTitle = "Unproven Recruit";
     
     for (let i = state.badges.length - 1; i >= 0; i--) {
@@ -128,7 +124,7 @@ function renderBadges() {
     if (!container) return;
     container.innerHTML = '';
 
-    const completedCount = state.tasks.filter(t => t.is_completed).length + state.completedHistory.length;
+    const completedCount = state.completedHistory.length;
     let knightPos = { bottom: 40, left: 10 };
 
     state.badges.forEach((badge, index) => {
@@ -185,7 +181,6 @@ function completeTask(index) {
     state.xp += 10;
     state.level = Math.floor(state.xp / 100) + 1;
 
-    // Record in history
     state.completedHistory.push({
         title: task.title,
         date: new Date().toLocaleString()
@@ -218,11 +213,8 @@ function checkAllTasks() {
 }
 
 function removeAllTasks() {
-    if (confirm("Are you sure you want to clear the Bounty Board and reset all progress?")) {
-        state.tasks = [];
-        state.completedHistory = [];
-        state.xp = 0;
-        state.level = 1;
+    if (confirm("Are you sure you want to clear the active Bounty Board? Your progress and history will be preserved.")) {
+        state.tasks = []; // Only clear active tasks, preserving history and XP
         saveState();
         renderAll();
     }
