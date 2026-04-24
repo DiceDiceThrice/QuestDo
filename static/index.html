@@ -3,61 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuestDo - Gamified Tasks</title>
-    <link rel="stylesheet" href="style.css">
+    <title>QuestDo | Master Your Day</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .xp-glow {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .quest-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quest-card:hover {
+            transform: translateX(8px);
+            background: rgba(51, 65, 85, 0.8);
+        }
+
+        .badge-locked {
+            filter: grayscale(1) blur(1px);
+            opacity: 0.4;
+        }
+
+        .badge-unlocked {
+            animation: pulse-gold 2s infinite;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.2));
+            border: 1px solid rgba(245, 158, 11, 0.5);
+        }
+
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
 </head>
-<body>
-    <div id="app">
-        <!-- Header Section -->
-        <header class="player-stats">
-            <div class="profile-header">
-                <span class="material-icons profile-icon">account_circle</span>
-                <h2 id="level-text">Level 1</h2>
-            </div>
-            <div class="xp-container">
-                <div id="xp-bar" class="xp-bar">
-                    <div id="xp-fill" class="xp-fill" style="width: 0%;"></div>
+<body class="text-slate-200 p-4 md:p-8">
+    <div class="max-w-xl mx-auto space-y-6">
+        
+        <!-- Header: Hero Profile Section -->
+        <header class="glass rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl"></div>
+            
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <span class="material-icons text-3xl text-white">bolt</span>
                 </div>
-                <p id="xp-text">0 / 100 XP to next level</p>
+                <div>
+                    <h1 class="text-sm font-bold text-indigo-400 uppercase tracking-widest">Player Profile</h1>
+                    <h2 id="level-text" class="text-3xl font-extrabold text-white">Level 1</h2>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-bold tracking-tighter uppercase text-slate-400">
+                    <span>Experience Points</span>
+                    <span id="xp-text">0 / 100 XP</span>
+                </div>
+                <div class="w-full h-4 bg-slate-800 rounded-full overflow-hidden p-1 border border-slate-700/50">
+                    <div id="xp-fill" class="h-full bg-gradient-to-r from-amber-400 to-orange-600 rounded-full transition-all duration-700 ease-out xp-glow" style="width: 0%"></div>
+                </div>
             </div>
         </header>
 
-        <!-- Navigation -->
-        <nav class="tabs">
-            <button id="tab-quests" class="tab-btn active" onclick="switchTab('quests')">
-                <span class="material-icons">list</span> Quest Board
+        <!-- Navigation Tabs -->
+        <nav class="flex p-1.5 bg-slate-900/50 backdrop-blur-md rounded-2xl border border-slate-800">
+            <button id="tab-quests" onclick="switchTab('quests')" class="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all duration-300 font-bold active-tab bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+                <span class="material-icons text-lg">auto_awesome</span> Quests
             </button>
-            <button id="tab-trophy" class="tab-btn" onclick="switchTab('trophy')">
-                <span class="material-icons">emoji_events</span> Trophy Room
+            <button id="tab-trophy" onclick="switchTab('trophy')" class="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all duration-300 font-bold text-slate-400 hover:text-slate-200">
+                <span class="material-icons text-lg">emoji_events</span> Trophies
             </button>
         </nav>
 
-        <!-- Main Content -->
-        <main>
-            <!-- Quest Board -->
-            <section id="quests-section">
-                <div class="add-task-container">
-                    <input type="text" id="task-input" placeholder="Enter a new quest..." onkeypress="handleEnter(event)">
-                    <button onclick="addTask()" class="add-btn"><span class="material-icons">add</span></button>
-                </div>
-                <ul id="task-list" class="task-list">
-                    <!-- Tasks will be injected here -->
-                </ul>
-            </section>
+        <!-- Main Quest View -->
+        <section id="quests-section" class="space-y-4 animate__animated animate__fadeIn">
+            <div class="relative group">
+                <input type="text" id="task-input" onkeypress="handleEnter(event)" placeholder="What is your next quest?" 
+                       class="w-full bg-slate-800/50 border-2 border-slate-700 rounded-2xl py-4 pl-5 pr-14 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all placeholder:text-slate-500">
+                <button onclick="addTask()" class="absolute right-2 top-2 w-10 h-10 bg-indigo-600 hover:bg-indigo-500 rounded-xl flex items-center justify-center transition-colors shadow-lg">
+                    <span class="material-icons">add</span>
+                </button>
+            </div>
 
-            <!-- Trophy Room -->
-            <section id="trophy-section" class="hidden">
-                <h3>Your Achievements</h3>
-                <div id="badge-grid" class="badge-grid">
-                    <!-- Badges will be injected here -->
-                </div>
-            </section>
-        </main>
+            <div id="task-list" class="space-y-3 pt-2">
+                <!-- Tasks injected here -->
+            </div>
+        </section>
 
-        <!-- Notification Toast -->
-        <div id="toast" class="toast hidden">Quest Completed! +10 XP</div>
+        <!-- Trophy Room View -->
+        <section id="trophy-section" class="hidden animate__animated animate__fadeIn">
+            <div class="grid grid-cols-2 gap-4" id="badge-grid">
+                <!-- Badges injected here -->
+            </div>
+        </section>
+
     </div>
+
+    <!-- Celebration Popup -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 glass px-6 py-4 rounded-2xl shadow-2xl border-indigo-500/50 flex items-center gap-3 opacity-0 pointer-events-none transition-all duration-500 transform translate-y-10">
+        <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center">
+            <span class="material-icons text-white text-sm">stars</span>
+        </div>
+        <div>
+            <p class="text-white font-bold text-sm">Quest Completed!</p>
+            <p class="text-amber-400 text-xs font-bold">+10 EXPERIENCE POINTS</p>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
