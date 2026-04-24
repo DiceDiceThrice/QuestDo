@@ -1,19 +1,10 @@
 // Advanced State Management
 const DEFAULT_BADGES = [
-    { id: 1, name: "The Squire's Start", description: "Earned a basic tunic.", requirement: 1, 
-      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,2L4,5v11c0,5.55,3.84,10.74,8,12c4.16-1.26,8-6.45,8-12V5L12,2z" fill="%238B4513"/></svg>` },
-    
-    { id: 2, name: "Light Skirmisher", description: "Secured a leather chestpiece.", requirement: 5, 
-      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="%23cd7f32"/></svg>` },
-    
-    { id: 3, name: "Rugged Vanguard", description: "Constructed iron-plate mail.", requirement: 10, 
-      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2z" fill="%23708090"/></svg>` },
-    
-    { id: 4, name: "Radiant Sentinel", description: "Adorned in shining steel.", requirement: 15, 
-      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="%23B0C4DE"/></svg>` },
-    
-    { id: 5, name: "Immortal Paladin", description: "The legendary heavy aegis.", requirement: 25, 
-      sprite: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2M12,14.5L7.5,18.4L12,4.3L16.5,18.4L12,14.5Z" fill="%23d4af37"/></svg>` }
+    { id: 1, name: "The Squire's Start", description: "Earned a basic tunic.", requirement: 1, color: "#8B4513" },
+    { id: 2, name: "Light Skirmisher", description: "Secured leather armor.", requirement: 5, color: "#cd7f32" },
+    { id: 3, name: "Rugged Vanguard", description: "Iron-plate mail.", requirement: 10, color: "#708090" },
+    { id: 4, name: "Radiant Sentinel", description: "Shining steel.", requirement: 15, color: "#B0C4DE" },
+    { id: 5, name: "Immortal Paladin", description: "Legendary gold aegis.", requirement: 25, color: "#d4af37" }
 ];
 
 let state = JSON.parse(localStorage.getItem('questDoState')) || {
@@ -23,7 +14,7 @@ let state = JSON.parse(localStorage.getItem('questDoState')) || {
     badges: DEFAULT_BADGES
 };
 
-// Update to ensure latest sprites are used
+// Migration: Use latest metadata
 state.badges = DEFAULT_BADGES.map((b, i) => ({...b, is_unlocked: (state.badges[i] ? state.badges[i].is_unlocked : false)}));
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -54,7 +45,7 @@ function switchTab(tab) {
         tSection.classList.remove('hidden');
         tBtn.classList.add('active'); tBtn.classList.remove('opacity-60');
         qBtn.classList.remove('active'); qBtn.classList.add('opacity-60');
-        setTimeout(renderBadges, 50); // Small delay to ensure DOM is visible
+        setTimeout(renderBadges, 50);
     }
 }
 
@@ -90,10 +81,8 @@ function renderBadges() {
     container.innerHTML = '';
 
     const completedCount = state.tasks.filter(t => t.is_completed).length;
-    
-    // Default Trainee (Brown clothes)
-    let currentHeroSprite = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H7V9H1v2h2v11h18V11h2V9z" fill="%238B4513"/></svg>`;
     let knightPos = { bottom: 40, left: 10 };
+    let knightColor = "#8B4513"; // Default brown
 
     state.badges.forEach((badge, index) => {
         const isUnlocked = completedCount >= badge.requirement;
@@ -102,7 +91,7 @@ function renderBadges() {
 
         if (isUnlocked) {
             knightPos = { bottom: bottom + 10, left: left };
-            currentHeroSprite = badge.sprite;
+            knightColor = badge.color;
         }
 
         const node = document.createElement('div');
@@ -126,10 +115,9 @@ function renderBadges() {
         knight.style.left = `${knightPos.left}%`;
         const graphic = knight.querySelector('.knight-graphic');
         if (graphic) {
-            // Encode the SVG properly for data URL
-            const encodedSvg = btoa(currentHeroSprite.replace('fill="%23', 'fill="#'));
-            graphic.style.backgroundImage = `url('data:image/svg+xml;base64,${encodedSvg}')`;
-            graphic.style.display = 'block';
+            // Reverting to the original Shield/Sword Knight icon but with dynamic colors
+            const svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="${knightColor.replace('#', '%23')}"><path d="M20.91 11.05C21 10.7 21 10.35 21 10c0-4.97-4.03-9-9-9s-9 4.03-9 9c0 .35 0 .7.09 1.05C2.41 12.18 2 13.54 2 15c0 3.87 3.13 7 7 7h6c3.87 0 7-3.13 7-7 0-1.46-.41-2.82-1.09-3.95zM12 3c3.87 0 7 3.13 7 7 0 .21 0 .42-.03.62C17.51 9.59 15.19 9 12 9s-5.51.59-6.97 1.62c-.03-.2-.03-.41-.03-.62 0-3.87 3.13-7 7-7zm3 17H9c-2.76 0-5-2.24-5-5 0-1.03.31-1.99.84-2.79C6.44 11.41 9.07 11 12 11s5.56.41 7.16 1.21c.53.8.84 1.76.84 2.79 0 2.76-2.24 5-5 5z"/></svg>`;
+            graphic.style.backgroundImage = `url('data:image/svg+xml;utf8,${svg}')`;
         }
     }
 }
