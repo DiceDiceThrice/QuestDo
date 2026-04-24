@@ -128,9 +128,9 @@ function renderBadges() {
         knight.style.left = `${knightPos.left}%`;
         const graphic = knight.querySelector('.knight-graphic');
         if (graphic) {
-            // Updated to use the Arrow Up icon with dynamic armor color
-            const svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="${knightColor.replace('#', '%23')}"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>`;
-            graphic.style.backgroundImage = `url('data:image/svg+xml;utf8,${svg}')`;
+            // Using the new PNG for the climbing knight
+            graphic.style.backgroundImage = "url('knight.png')";
+            graphic.style.display = 'block';
         }
     }
 }
