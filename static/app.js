@@ -79,7 +79,7 @@ function renderTasks() {
     if (!list) return;
     list.innerHTML = '';
     if (state.tasks.length === 0) {
-        list.innerHTML = `<div class="text-center py-10 italic font-bold text-wood opacity-40">No active decrees.</div>`;
+        list.innerHTML = `<div class="text-center py-10 italic font-bold text-white opacity-40">No active decrees.</div>`;
         return;
     }
     state.tasks.forEach((task, index) => {
@@ -87,8 +87,8 @@ function renderTasks() {
         li.className = `bounty-card flex items-center gap-4 p-5 rounded-xl shadow-lg ${task.is_completed ? 'opacity-50' : ''}`;
         li.innerHTML = `
             <input type="checkbox" ${task.is_completed ? 'checked disabled' : ''} onchange="completeTask(${index})" class="seal-checkbox">
-            <span class="flex-1 text-xl font-bold text-wood rpg-body ${task.is_completed ? 'line-through text-wood/40' : ''}">${task.title}</span>
-            <button onclick="deleteTask(${index})" class="text-wood/40 hover:text-crimson transition-all"><span class="material-icons">close</span></button>
+            <span class="flex-1 text-xl font-bold text-white rpg-body ${task.is_completed ? 'line-through text-white/40' : ''}">${task.title}</span>
+            <button onclick="deleteTask(${index})" class="text-white/40 hover:text-crimson transition-all"><span class="material-icons">close</span></button>
         `;
         list.appendChild(li);
     });
@@ -100,20 +100,20 @@ function renderHistory() {
     list.innerHTML = '';
     
     if (state.completedHistory.length === 0) {
-        list.innerHTML = `<div class="text-center py-10 italic text-wood/40">No deeds have been recorded yet.</div>`;
+        list.innerHTML = `<div class="text-center py-10 italic text-white/60">No deeds have been recorded yet.</div>`;
         return;
     }
 
     [...state.completedHistory].reverse().forEach(item => {
         const entry = document.createElement('div');
-        entry.className = "flex items-center gap-3 p-3 border-l-4 border-gold bg-wood/5 rounded-r";
+        entry.className = "flex items-center gap-3 p-3 border-l-4 border-gold bg-white/5 rounded-r";
         entry.innerHTML = `
             <span class="material-icons text-gold text-sm">verified</span>
             <div class="flex-1">
-                <p class="text-wood font-bold text-sm">${item.title}</p>
-                <p class="text-[9px] text-wood/40 uppercase font-bold">${item.date}</p>
+                <p class="text-white font-bold text-sm">${item.title}</p>
+                <p class="text-[9px] text-white/40 uppercase font-bold">${item.date}</p>
             </div>
-            <span class="text-[10px] font-black text-green-800">+10 XP</span>
+            <span class="text-[10px] font-black text-green-400">+10 XP</span>
         `;
         list.appendChild(entry);
     });
@@ -217,6 +217,18 @@ function removeAllTasks() {
         state.tasks = []; // Only clear active tasks, preserving history and XP
         saveState();
         renderAll();
+    }
+}
+
+function resetLegacy() {
+    if (confirm("WARNING: This will permanently erase your entire legacy, including Hall of Records, Rank, and Mountain Progress. Are you sure?")) {
+        state.tasks = [];
+        state.completedHistory = [];
+        state.xp = 0;
+        state.level = 1;
+        saveState();
+        renderAll();
+        showToast("Legacy Erased.");
     }
 }
 

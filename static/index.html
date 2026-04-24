@@ -14,7 +14,7 @@
             --parchment: #f4e4bc;
             --gold: #d4af37;
             --crimson: #7c0a02;
-            --wood: #1a120b; /* Darkened from #3d2b1f for better visibility */
+            --wood: #1a120b;
             --mountain-base: #1a120b;
             --mountain-mid: #3d2b1f;
             --mountain-peak: #5c4033;
@@ -39,11 +39,13 @@
         .rpg-body { font-family: 'MedievalSharp', cursive; }
 
         .parchment-card {
-            background: #f4e4bc;
-            background-image: url('https://www.transparenttextures.com/patterns/paper.png');
-            color: #3d2b1f;
+            background: #2a1b12; /* Dark wood background */
+            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            color: #ffffff; /* Crisp white text */
             border: 8px solid #3d2b1f;
             border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect x="0" y="0" width="50" height="50" fill="none" stroke="%233d2b1f" stroke-width="10"/></svg>') 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
+            position: relative;
         }
 
         .rpg-btn {
@@ -154,8 +156,8 @@
 
         .node-info {
             position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
-            width: 150px; background: #f4e4bc; padding: 10px; border-radius: 8px;
-            border: 2px solid var(--wood); color: var(--wood); font-size: 11px;
+            width: 150px; background: #3d2b1f; padding: 10px; border-radius: 8px;
+            border: 2px solid var(--gold); color: #ffffff; font-size: 11px;
             text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
@@ -199,6 +201,16 @@
             content: '✓'; position: absolute; color: white;
             font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
+
+        .bounty-card {
+            background: #3d2b1f; /* Dark wood notice */
+            background-image: url('https://www.transparenttextures.com/patterns/dark-leather.png');
+            border: 2px solid var(--gold);
+            color: #ffffff; /* White text for contrast */
+            transform: rotate(-0.5deg);
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -212,12 +224,12 @@
                     <img src="knight.png" class="w-16 h-16 object-contain" alt="Knight Icon">
                 </div>
                 <div class="flex-1">
-                    <h1 id="rank-title" class="text-xs font-bold uppercase tracking-widest text-wood/60 transition-all duration-500">Unproven Recruit</h1>
+                    <h1 id="rank-title" class="text-xs font-bold uppercase tracking-widest text-white/60 transition-all duration-500">Unproven Recruit</h1>
                     <h2 id="level-text" class="rpg-header text-4xl font-black text-crimson uppercase">Rank 1</h2>
                 </div>
             </div>
             <div class="mt-4 space-y-2">
-                <div class="flex justify-between rpg-header text-sm font-bold text-wood">
+                <div class="flex justify-between rpg-header text-sm font-bold text-white">
                     <span>Bounty Progress</span>
                     <span id="xp-text">0 / 100</span>
                 </div>
@@ -259,7 +271,12 @@
         <!-- History Section (Hall of Records) -->
         <section id="history-section" class="hidden animate__animated animate__fadeIn space-y-4">
             <div class="parchment-card p-6 rounded shadow-xl">
-                <h3 class="rpg-header text-2xl text-wood border-b-2 border-wood/20 pb-2 mb-4">Hall of Records</h3>
+                <div class="flex justify-between items-center border-b-2 border-white/20 pb-2 mb-4">
+                    <h3 class="rpg-header text-2xl text-white">Hall of Records</h3>
+                    <button onclick="resetLegacy()" class="bg-red-900/50 hover:bg-red-800 text-white text-[10px] font-bold px-3 py-1 rounded border border-red-700 transition-all uppercase tracking-tighter">
+                        Reset Legacy
+                    </button>
+                </div>
                 <div id="history-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
                     <!-- Completed quests will be logged here -->
                 </div>
