@@ -11,8 +11,12 @@ let state = JSON.parse(localStorage.getItem('questDoState')) || {
     xp: 0,
     level: 1,
     tasks: [],
+    completedHistory: [], // New property for progress tracking
     badges: DEFAULT_BADGES
 };
+
+// Ensure new property exists
+if (!state.completedHistory) state.completedHistory = [];
 
 // Sync metadata
 state.badges = DEFAULT_BADGES.map((b, i) => ({...b, is_unlocked: (state.badges[i] ? state.badges[i].is_unlocked : false)}));
@@ -27,38 +31,43 @@ function renderAll() {
     renderStats();
     renderTasks();
     renderBadges();
+    renderHistory();
 }
 
 function switchTab(tab) {
-    const qSection = document.getElementById('quests-section');
-    const tSection = document.getElementById('trophy-section');
-    const qBtn = document.getElementById('tab-quests');
-    const tBtn = document.getElementById('tab-trophy');
+    const sections = {
+        'quests': document.getElementById('quests-section'),
+        'history': document.getElementById('history-section'),
+        'trophy': document.getElementById('trophy-section')
+    };
+    const buttons = {
+        'quests': document.getElementById('tab-quests'),
+        'history': document.getElementById('tab-history'),
+        'trophy': document.getElementById('tab-trophy')
+    };
 
-    if (tab === 'quests') {
-        qSection.classList.remove('hidden');
-        tSection.classList.add('hidden');
-        qBtn.classList.add('active'); qBtn.classList.remove('opacity-60');
-        tBtn.classList.remove('active'); tBtn.classList.add('opacity-60');
-    } else {
-        qSection.classList.add('hidden');
-        tSection.classList.remove('hidden');
-        tBtn.classList.add('active'); tBtn.classList.remove('opacity-60');
-        qBtn.classList.remove('active'); qBtn.classList.add('opacity-60');
-        setTimeout(renderBadges, 50);
-    }
+    // Hide all, deactivate all
+    Object.values(sections).forEach(s => s.classList.add('hidden'));
+    Object.values(buttons).forEach(b => { b.classList.remove('active'); b.classList.add('opacity-60'); });
+
+    // Show selected, activate selected
+    sections[tab].classList.remove('hidden');
+    buttons[tab].classList.add('active');
+    buttons[tab].classList.remove('opacity-60');
+
+    if (tab === 'trophy') setTimeout(renderBadges, 50);
+    if (tab === 'history') renderHistory();
 }
 
 function renderStats() {
+    document.getElementById('level-text').innerText = `Rank ${state.level}`;
     const xpPercent = state.xp % 100;
     document.getElementById('xp-fill').style.width = `${xpPercent}%`;
     document.getElementById('xp-text').innerText = `${xpPercent} / 100`;
 
-    // Dynamic Rank Title
-    const completedCount = state.tasks.filter(t => t.is_completed).length;
+    const completedCount = state.tasks.filter(t => t.is_completed).length + state.completedHistory.length;
     let currentTitle = "Unproven Recruit";
     
-    // Find the highest unlocked milestone name
     for (let i = state.badges.length - 1; i >= 0; i--) {
         if (completedCount >= state.badges[i].requirement) {
             currentTitle = state.badges[i].name;
@@ -83,9 +92,34 @@ function renderTasks() {
         li.innerHTML = `
             <input type="checkbox" ${task.is_completed ? 'checked disabled' : ''} onchange="completeTask(${index})" class="seal-checkbox">
             <span class="flex-1 text-xl font-bold text-wood rpg-body ${task.is_completed ? 'line-through text-wood/40' : ''}">${task.title}</span>
-            <button onclick="deleteTask(${index})" class="text-wood/40 hover:text-crimson"><span class="material-icons">close</span></button>
+            <button onclick="deleteTask(${index})" class="text-wood/40 hover:text-crimson transition-all"><span class="material-icons">close</span></button>
         `;
         list.appendChild(li);
+    });
+}
+
+function renderHistory() {
+    const list = document.getElementById('history-list');
+    if (!list) return;
+    list.innerHTML = '';
+    
+    if (state.completedHistory.length === 0) {
+        list.innerHTML = `<div class="text-center py-10 italic text-wood/40">No deeds have been recorded yet.</div>`;
+        return;
+    }
+
+    [...state.completedHistory].reverse().forEach(item => {
+        const entry = document.createElement('div');
+        entry.className = "flex items-center gap-3 p-3 border-l-4 border-gold bg-wood/5 rounded-r";
+        entry.innerHTML = `
+            <span class="material-icons text-gold text-sm">verified</span>
+            <div class="flex-1">
+                <p class="text-wood font-bold text-sm">${item.title}</p>
+                <p class="text-[9px] text-wood/40 uppercase font-bold">${item.date}</p>
+            </div>
+            <span class="text-[10px] font-black text-green-800">+10 XP</span>
+        `;
+        list.appendChild(entry);
     });
 }
 
@@ -94,19 +128,15 @@ function renderBadges() {
     if (!container) return;
     container.innerHTML = '';
 
-    const completedCount = state.tasks.filter(t => t.is_completed).length;
+    const completedCount = state.tasks.filter(t => t.is_completed).length + state.completedHistory.length;
     let knightPos = { bottom: 40, left: 10 };
-    let knightColor = "#8B4513";
 
     state.badges.forEach((badge, index) => {
         const isUnlocked = completedCount >= badge.requirement;
         const bottom = 120 + (index * 120);
         const left = (index % 2 === 0) ? 65 : 25;
 
-        if (isUnlocked) {
-            knightPos = { bottom: bottom + 10, left: left };
-            knightColor = badge.color;
-        }
+        if (isUnlocked) knightPos = { bottom: bottom + 10, left: left };
 
         const node = document.createElement('div');
         node.className = `milestone-node ${isUnlocked ? 'unlocked' : 'locked'}`;
@@ -149,25 +179,36 @@ function handleEnter(e) { if (e.key === 'Enter') addTask(); }
 
 function completeTask(index) {
     if (state.tasks[index].is_completed) return;
-    state.tasks[index].is_completed = true;
+    
+    const task = state.tasks[index];
+    task.is_completed = true;
     state.xp += 10;
     state.level = Math.floor(state.xp / 100) + 1;
+
+    // Record in history
+    state.completedHistory.push({
+        title: task.title,
+        date: new Date().toLocaleString()
+    });
+
     showToast();
     saveState();
     renderAll();
 }
 
-// New Multi-Action Functions
 function checkAllTasks() {
     let tasksUpdated = false;
     state.tasks.forEach(task => {
         if (!task.is_completed) {
             task.is_completed = true;
             state.xp += 10;
+            state.completedHistory.push({
+                title: task.title,
+                date: new Date().toLocaleString()
+            });
             tasksUpdated = true;
         }
     });
-    
     if (tasksUpdated) {
         state.level = Math.floor(state.xp / 100) + 1;
         saveState();
@@ -177,8 +218,9 @@ function checkAllTasks() {
 }
 
 function removeAllTasks() {
-    if (confirm("Are you sure you want to clear the Bounty Board? This will reset your progress and rank.")) {
+    if (confirm("Are you sure you want to clear the Bounty Board and reset all progress?")) {
         state.tasks = [];
+        state.completedHistory = [];
         state.xp = 0;
         state.level = 1;
         saveState();
@@ -189,16 +231,13 @@ function removeAllTasks() {
 function deleteTask(index) {
     state.tasks.splice(index, 1);
     saveState();
-    renderTasks();
-    renderBadges();
-    renderStats();
+    renderAll();
 }
 
 function showToast(message = "QUEST CONQUERED!") {
     const toast = document.getElementById('toast');
     const toastTitle = toast.querySelector('h3');
     if (toastTitle) toastTitle.innerText = message;
-    
     toast.style.opacity = '1';
     toast.style.transform = 'translate(-50%, 0)';
     setTimeout(() => {

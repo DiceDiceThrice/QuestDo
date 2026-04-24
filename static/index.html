@@ -213,7 +213,7 @@
                 </div>
                 <div class="flex-1">
                     <h1 id="rank-title" class="text-xs font-bold uppercase tracking-widest text-wood/60 transition-all duration-500">Unproven Recruit</h1>
-                    <!-- Numerical Rank removed as requested -->
+                    <h2 id="level-text" class="rpg-header text-4xl font-black text-crimson uppercase">Rank 1</h2>
                 </div>
             </div>
             <div class="mt-4 space-y-2">
@@ -229,9 +229,10 @@
         </header>
 
         <!-- Navigation -->
-        <nav class="flex gap-4">
-            <button id="tab-quests" onclick="switchTab('quests')" class="rpg-btn flex-1 py-4 rounded-xl font-bold rpg-header text-lg active shadow-lg">Bounty Board</button>
-            <button id="tab-trophy" onclick="switchTab('trophy')" class="rpg-btn flex-1 py-4 rounded-xl font-bold rpg-header text-lg opacity-60 shadow-lg">Legendary Ascent</button>
+        <nav class="flex gap-2">
+            <button id="tab-quests" onclick="switchTab('quests')" class="rpg-btn flex-1 py-3 rounded-lg font-bold rpg-header text-xs active shadow-lg">Bounty Board</button>
+            <button id="tab-history" onclick="switchTab('history')" class="rpg-btn flex-1 py-3 rounded-lg font-bold rpg-header text-xs opacity-60 shadow-lg">Hall of Records</button>
+            <button id="tab-trophy" onclick="switchTab('trophy')" class="rpg-btn flex-1 py-3 rounded-lg font-bold rpg-header text-xs opacity-60 shadow-lg">Legendary Ascent</button>
         </nav>
 
         <!-- Quest Section -->
@@ -244,15 +245,25 @@
 
             <!-- New Multi-Action Buttons -->
             <div class="flex gap-3">
-                <button onclick="checkAllTasks()" class="flex-1 bg-green-800 text-white font-bold py-2 px-4 rounded border-2 border-green-950 hover:bg-green-700 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                <button onclick="checkAllTasks()" class="flex-1 bg-green-800 text-white font-bold py-2 px-4 rounded border-2 border-green-950 hover:bg-green-700 transition-all text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
                     <span class="material-icons text-sm">done_all</span> Check All
                 </button>
-                <button onclick="removeAllTasks()" class="flex-1 bg-red-900 text-white font-bold py-2 px-4 rounded border-2 border-red-950 hover:bg-red-800 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                <button onclick="removeAllTasks()" class="flex-1 bg-red-900 text-white font-bold py-2 px-4 rounded border-2 border-red-950 hover:bg-red-800 transition-all text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
                     <span class="material-icons text-sm">delete_sweep</span> Remove All
                 </button>
             </div>
 
             <div id="task-list" class="space-y-4"></div>
+        </section>
+
+        <!-- History Section (Hall of Records) -->
+        <section id="history-section" class="hidden animate__animated animate__fadeIn space-y-4">
+            <div class="parchment-card p-6 rounded shadow-xl">
+                <h3 class="rpg-header text-2xl text-wood border-b-2 border-wood/20 pb-2 mb-4">Hall of Records</h3>
+                <div id="history-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                    <!-- Completed quests will be logged here -->
+                </div>
+            </div>
         </section>
 
         <!-- Graphical Mountain Section -->
