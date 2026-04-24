@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuestDo | Epic Ascent</title>
+    <title>QuestDo | Legendary Ascent</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -15,8 +15,9 @@
             --gold: #d4af37;
             --crimson: #7c0a02;
             --wood: #3d2b1f;
-            --mountain-dark: #2c1e14;
-            --mountain-light: #4a3728;
+            --mountain-base: #1a120b;
+            --mountain-mid: #3d2b1f;
+            --mountain-peak: #5c4033;
         }
 
         body {
@@ -30,7 +31,6 @@
         .rpg-header { font-family: 'Cinzel Decorative', cursive; }
         .rpg-body { font-family: 'MedievalSharp', cursive; }
 
-        /* General UI Elements */
         .parchment-card {
             background: #f4e4bc;
             background-image: url('https://www.transparenttextures.com/patterns/paper.png');
@@ -52,124 +52,118 @@
             box-shadow: 0 0 20px var(--crimson);
         }
 
-        /* The Grand Mountain Graphics */
+        /* Detailed Mountain Graphics */
         .mountain-world {
             height: 700px;
-            background: linear-gradient(to top, #1a120b 0%, #3d2b1f 40%, #5c4033 100%);
+            background: linear-gradient(to top, #0f0a07 0%, #1a120b 30%, #3d2b1f 70%, #5c4033 100%);
             border: 6px solid var(--wood);
             position: relative;
             overflow: hidden;
             border-radius: 30px;
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 100px rgba(0,0,0,1);
         }
 
-        /* CSS-Drawn Mountain Peaks */
-        .peak {
+        /* Rocky Texture Peaks */
+        .rock-peak {
             position: absolute;
-            bottom: -50px;
-            width: 0;
-            height: 0;
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            border-bottom: 400px solid var(--mountain-dark);
-            filter: drop-shadow(0 0 20px rgba(0,0,0,0.5));
+            bottom: -20px;
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+            background: linear-gradient(135deg, #2c1e14 0%, #1a120b 100%);
+            box-shadow: inset -10px 0 20px rgba(0,0,0,0.5);
         }
 
-        .peak-2 { border-bottom: 550px solid #231810; left: 10%; z-index: 1; }
-        .peak-3 { border-bottom: 450px solid #1a120b; right: -5%; z-index: 2; }
-        
-        /* The Climbing Path */
-        .zig-zag-path {
+        .rock-peak::after {
+            content: '';
             position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            pointer-events: none;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/rocky-wall.png');
+            opacity: 0.3;
         }
 
-        .milestone-node {
+        .snow-cap {
             position: absolute;
-            z-index: 10;
-            transition: all 0.5s;
-        }
-
-        .flag-pole {
-            width: 4px;
-            height: 40px;
-            background: var(--gold);
-            position: relative;
-        }
-
-        .flag-cloth {
-            position: absolute;
-            top: 0;
-            left: 4px;
-            width: 30px;
-            height: 20px;
-            background: var(--crimson);
-            clip-path: polygon(0 0, 100% 50%, 0 100%);
-            animation: wave 2s infinite ease-in-out;
-        }
-
-        @keyframes wave {
-            0%, 100% { transform: skewY(0deg); }
-            50% { transform: skewY(10deg); }
-        }
-
-        .node-info {
-            position: absolute;
-            top: 45px;
-            left: 50%;
+            top: 0; left: 50%;
             transform: translateX(-50%);
-            width: 140px;
-            background: rgba(244, 228, 188, 0.95);
-            padding: 8px;
-            border-radius: 8px;
-            border: 2px solid var(--wood);
-            color: var(--wood);
-            font-size: 10px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            width: 100%; height: 30%;
+            background: #fff;
+            clip-path: polygon(50% 0%, 100% 100%, 80% 80%, 60% 100%, 40% 80%, 20% 100%, 0% 100%);
+            opacity: 0.2;
         }
 
-        .locked .flag-cloth { background: #555; }
-        .locked .flag-pole { background: #333; }
-        .locked .node-info { opacity: 0.5; filter: grayscale(1); }
+        /* Forest Layer at Bottom */
+        .forest-layer {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 100px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="50" viewBox="0 0 100 50"><path d="M10 50 L25 10 L40 50 Z M45 50 L60 20 L75 50 Z M80 50 L90 30 L100 50 Z" fill="%230a0705"/></svg>');
+            background-repeat: repeat-x;
+            opacity: 0.8;
+            z-index: 3;
+        }
 
-        /* The Knight */
+        /* Knight Icon (Detailed SVG) */
         .knight-container {
             position: absolute;
-            width: 60px;
-            height: 80px;
+            width: 70px;
+            height: 90px;
             z-index: 20;
-            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            filter: drop-shadow(0 0 10px var(--gold));
+            transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 15px var(--gold));
         }
 
         .knight-graphic {
             width: 100%;
             height: 100%;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23d4af37"><path d="M20.91 11.05C21 10.7 21 10.35 21 10c0-4.97-4.03-9-9-9s-9 4.03-9 9c0 .35 0 .7.09 1.05C2.41 12.18 2 13.54 2 15c0 3.87 3.13 7 7 7h6c3.87 0 7-3.13 7-7 0-1.46-.41-2.82-1.09-3.95zM12 3c3.87 0 7 3.13 7 7 0 .21 0 .42-.03.62C17.51 9.59 15.19 9 12 9s-5.51.59-6.97 1.62c-.03-.2-.03-.41-.03-.62 0-3.87 3.13-7 7-7zm3 17H9c-2.76 0-5-2.24-5-5 0-1.03.31-1.99.84-2.79C6.44 11.41 9.07 11 12 11s5.56.41 7.16 1.21c.53.8.84 1.76.84 2.79 0 2.76-2.24 5-5 5z"/></svg>');
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 0c-44.18 0-80 35.82-80 80 0 16.48 4.99 31.78 13.53 44.5L160 160h192l-29.53-35.5C331.01 111.78 336 96.48 336 80c0-44.18-35.82-80-80-80zm0 48c17.67 0 32 14.33 32 32s-14.33 32-32 32-32-14.33-32-32 14.33-32 32-32zm-64 144v288c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V192H192zm32 160h64v32h-64v-32zm0-64h64v32h-64v-32zm0-64h64v32h-64v-32z" fill="%23d4af37"/><path d="M416 192h-32v32h-32v-32h-32l32-64h64zM96 192h32v32h32v-32h32l-32-64H96z" fill="%237c0a02"/></svg>');
             background-size: contain;
             background-repeat: no-repeat;
-            animation: climb-bob 0.6s infinite alternate;
+            animation: climb-sway 1.5s infinite ease-in-out;
         }
 
-        @keyframes climb-bob {
-            from { transform: translateY(0) rotate(-2deg); }
-            to { transform: translateY(-8px) rotate(2deg); }
+        @keyframes climb-sway {
+            0% { transform: translateY(0) rotate(-3deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+            100% { transform: translateY(0) rotate(-3deg); }
         }
 
-        /* Cloud Layer */
-        .cloud {
+        /* Milestones */
+        .milestone-node { position: absolute; z-index: 10; transition: all 0.5s; }
+        .flag-pole { width: 4px; height: 45px; background: var(--gold); position: relative; border-radius: 2px; }
+        .flag-cloth {
+            position: absolute; top: 0; left: 4px; width: 35px; height: 25px;
+            background: var(--crimson); clip-path: polygon(0 0, 100% 50%, 0 100%);
+            animation: wave 2.5s infinite ease-in-out;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        @keyframes wave { 0%, 100% { transform: scaleX(1) skewY(0deg); } 50% { transform: scaleX(0.8) skewY(5deg); } }
+
+        .node-info {
+            position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
+            width: 150px; background: #f4e4bc; padding: 10px; border-radius: 8px;
+            border: 2px solid var(--wood); color: var(--wood); font-size: 11px;
+            text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .locked .flag-cloth { background: #333; }
+        .locked .node-info { opacity: 0.4; filter: sepia(1); }
+
+        /* Atmospheric Effects */
+        .mist {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: linear-gradient(to top, transparent 50%, rgba(255,255,255,0.05) 100%);
+            pointer-events: none; z-index: 10;
+        }
+
+        .star {
             position: absolute;
             background: white;
-            opacity: 0.1;
-            filter: blur(20px);
             border-radius: 50%;
-            z-index: 15;
+            animation: twinkle 3s infinite;
         }
 
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* UI Utilities */
         .seal-checkbox {
             appearance: none; width: 30px; height: 30px;
             background: #9d2016; border-radius: 50%; cursor: pointer;
@@ -180,9 +174,6 @@
             content: '✓'; position: absolute; color: white;
             font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
-
-        .xp-vial { background: #2a2a2a; border: 3px solid #555; border-radius: 4px; overflow: hidden; position: relative; }
-        .xp-fluid { background: linear-gradient(to bottom, #ff4d4d, #7c0a02); box-shadow: 0 0 20px #ff4d4d; transition: width 1s ease; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -192,11 +183,11 @@
         <header class="parchment-card p-6 rounded shadow-2xl relative overflow-hidden">
             <div class="flex items-center gap-6">
                 <div class="w-20 h-20 rounded-full border-4 border-wood flex items-center justify-center bg-wood">
-                    <span class="material-icons text-5xl text-gold">security</span>
+                    <div class="w-12 h-12 bg-contain bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=&quot;0 0 512 512&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;><path d=&quot;M256 0c-44.18 0-80 35.82-80 80 0 16.48 4.99 31.78 13.53 44.5L160 160h192l-29.53-35.5C331.01 111.78 336 96.48 336 80c0-44.18-35.82-80-80-80zm0 48c17.67 0 32 14.33 32 32s-14.33 32-32 32-32-14.33-32-32 14.33-32 32-32zm-64 144v288c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V192H192zm32 160h64v32h-64v-32zm0-64h64v32h-64v-32zm0-64h64v32h-64v-32z&quot; fill=&quot;%23d4af37&quot;/><path d=&quot;M416 192h-32v32h-32v-32h-32l32-64h64zM96 192h32v32h32v-32h32l-32-64H96z&quot; fill=&quot;%237c0a02&quot;/></svg>')"></div>
                 </div>
                 <div class="flex-1">
-                    <h1 class="text-xs font-bold uppercase tracking-widest text-wood/60">Grand Knight</h1>
-                    <h2 id="level-text" class="rpg-header text-4xl font-black text-crimson">Rank 1</h2>
+                    <h1 class="text-xs font-bold uppercase tracking-widest text-wood/60">Grand Champion</h1>
+                    <h2 id="level-text" class="rpg-header text-4xl font-black text-crimson uppercase">Rank 1</h2>
                 </div>
             </div>
             <div class="mt-4 space-y-2">
@@ -211,7 +202,7 @@
         <!-- Navigation -->
         <nav class="flex gap-4">
             <button id="tab-quests" onclick="switchTab('quests')" class="rpg-btn flex-1 py-4 rounded-xl font-bold rpg-header text-lg active shadow-lg">Bounty Board</button>
-            <button id="tab-trophy" onclick="switchTab('trophy')" class="rpg-btn flex-1 py-4 rounded-xl font-bold rpg-header text-lg opacity-60 shadow-lg">The Great Ascent</button>
+            <button id="tab-trophy" onclick="switchTab('trophy')" class="rpg-btn flex-1 py-4 rounded-xl font-bold rpg-header text-lg opacity-60 shadow-lg">Legendary Ascent</button>
         </nav>
 
         <!-- Quest Section -->
@@ -227,18 +218,27 @@
         <!-- Graphical Mountain Section -->
         <section id="trophy-section" class="hidden animate__animated animate__fadeIn space-y-6">
             <div class="mountain-world" id="world">
-                <!-- Peak layers -->
-                <div class="peak peak-2"></div>
-                <div class="peak peak-3" style="left: 60%"></div>
+                <!-- Stars -->
+                <div class="star w-1 h-1 top-10 left-10"></div>
+                <div class="star w-1 h-1 top-20 right-20"></div>
+                <div class="star w-1 h-1 top-40 left-1/2"></div>
                 
-                <!-- Cloud layers -->
-                <div class="cloud w-64 h-24 top-20 -left-20 animate-pulse"></div>
-                <div class="cloud w-80 h-32 top-60 -right-40 animate-pulse"></div>
+                <!-- Detailed Rock Peaks -->
+                <div class="rock-peak" style="width: 400px; height: 500px; left: -100px; bottom: -50px; z-index: 1;">
+                    <div class="snow-cap"></div>
+                </div>
+                <div class="rock-peak" style="width: 500px; height: 600px; right: -150px; bottom: -80px; z-index: 2;">
+                    <div class="snow-cap"></div>
+                </div>
+                <div class="rock-peak" style="width: 600px; height: 750px; left: 10%; bottom: -100px; z-index: 0; background: #1a120b;"></div>
                 
-                <!-- Milestones (Nodes) -->
+                <div class="forest-layer"></div>
+                <div class="mist"></div>
+                
+                <!-- Milestones -->
                 <div id="nodes-container"></div>
                 
-                <!-- The Knight -->
+                <!-- The Detailed Knight -->
                 <div id="knight" class="knight-container" style="bottom: 40px; left: 10%;">
                     <div class="knight-graphic"></div>
                 </div>
