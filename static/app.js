@@ -14,7 +14,7 @@ let state = JSON.parse(localStorage.getItem('questDoState')) || {
     badges: DEFAULT_BADGES
 };
 
-// Migration: Use latest metadata
+// Sync metadata
 state.badges = DEFAULT_BADGES.map((b, i) => ({...b, is_unlocked: (state.badges[i] ? state.badges[i].is_unlocked : false)}));
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -54,6 +54,19 @@ function renderStats() {
     const xpPercent = state.xp % 100;
     document.getElementById('xp-fill').style.width = `${xpPercent}%`;
     document.getElementById('xp-text').innerText = `${xpPercent} / 100`;
+
+    // Dynamic Rank Title
+    const completedCount = state.tasks.filter(t => t.is_completed).length;
+    let currentTitle = "Unproven Recruit";
+    
+    // Find the highest unlocked milestone name
+    for (let i = state.badges.length - 1; i >= 0; i--) {
+        if (completedCount >= state.badges[i].requirement) {
+            currentTitle = state.badges[i].name;
+            break;
+        }
+    }
+    document.getElementById('rank-title').innerText = currentTitle;
 }
 
 function renderTasks() {
@@ -82,7 +95,7 @@ function renderBadges() {
 
     const completedCount = state.tasks.filter(t => t.is_completed).length;
     let knightPos = { bottom: 40, left: 10 };
-    let knightColor = "#8B4513"; // Default brown
+    let knightColor = "#8B4513";
 
     state.badges.forEach((badge, index) => {
         const isUnlocked = completedCount >= badge.requirement;
@@ -115,8 +128,8 @@ function renderBadges() {
         knight.style.left = `${knightPos.left}%`;
         const graphic = knight.querySelector('.knight-graphic');
         if (graphic) {
-            // Reverting to the original Shield/Sword Knight icon but with dynamic colors
-            const svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="${knightColor.replace('#', '%23')}"><path d="M20.91 11.05C21 10.7 21 10.35 21 10c0-4.97-4.03-9-9-9s-9 4.03-9 9c0 .35 0 .7.09 1.05C2.41 12.18 2 13.54 2 15c0 3.87 3.13 7 7 7h6c3.87 0 7-3.13 7-7 0-1.46-.41-2.82-1.09-3.95zM12 3c3.87 0 7 3.13 7 7 0 .21 0 .42-.03.62C17.51 9.59 15.19 9 12 9s-5.51.59-6.97 1.62c-.03-.2-.03-.41-.03-.62 0-3.87 3.13-7 7-7zm3 17H9c-2.76 0-5-2.24-5-5 0-1.03.31-1.99.84-2.79C6.44 11.41 9.07 11 12 11s5.56.41 7.16 1.21c.53.8.84 1.76.84 2.79 0 2.76-2.24 5-5 5z"/></svg>`;
+            // Updated to use the Arrow Up icon with dynamic armor color
+            const svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="${knightColor.replace('#', '%23')}"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>`;
             graphic.style.backgroundImage = `url('data:image/svg+xml;utf8,${svg}')`;
         }
     }
