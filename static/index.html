@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestDo - Gamified Tasks</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Header Section -->
+        <header class="player-stats">
+            <div class="profile-header">
+                <span class="material-icons profile-icon">account_circle</span>
+                <h2 id="level-text">Level 1</h2>
+            </div>
+            <div class="xp-container">
+                <div id="xp-bar" class="xp-bar">
+                    <div id="xp-fill" class="xp-fill" style="width: 0%;"></div>
+                </div>
+                <p id="xp-text">0 / 100 XP to next level</p>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="tabs">
+            <button id="tab-quests" class="tab-btn active" onclick="switchTab('quests')">
+                <span class="material-icons">list</span> Quest Board
+            </button>
+            <button id="tab-trophy" class="tab-btn" onclick="switchTab('trophy')">
+                <span class="material-icons">emoji_events</span> Trophy Room
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Quest Board -->
+            <section id="quests-section">
+                <div class="add-task-container">
+                    <input type="text" id="task-input" placeholder="Enter a new quest..." onkeypress="handleEnter(event)">
+                    <button onclick="addTask()" class="add-btn"><span class="material-icons">add</span></button>
+                </div>
+                <ul id="task-list" class="task-list">
+                    <!-- Tasks will be injected here -->
+                </ul>
+            </section>
+
+            <!-- Trophy Room -->
+            <section id="trophy-section" class="hidden">
+                <h3>Your Achievements</h3>
+                <div id="badge-grid" class="badge-grid">
+                    <!-- Badges will be injected here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Notification Toast -->
+        <div id="toast" class="toast hidden">Quest Completed! +10 XP</div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
